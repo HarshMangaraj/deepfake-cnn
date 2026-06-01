@@ -38,7 +38,9 @@ model.eval()
 
 
 # open test image
-image = Image.open("data/test.jpeg")
+image = Image.open(
+    "data/fake/index.jpg"
+).convert("RGB")
 
 tensor = transform(image)
 
@@ -50,13 +52,27 @@ with torch.no_grad():
 
     output = model(tensor)
 
-    prediction = torch.argmax(
+    probabilities = torch.softmax(
         output,
         dim=1
     )
 
+    prediction = torch.argmax(
+        probabilities,
+        dim=1
+    )
+
+    confidence = probabilities[
+        0,
+        prediction.item()
+    ].item()
+
     if prediction.item() == 0:
-        print("Prediction: REAL")
+        print(
+            f"Prediction: REAL ({confidence:.2%})"
+        )
 
     else:
-        print("Prediction: FAKE")
+        print(
+            f"Prediction: FAKE ({confidence:.2%})"
+        )

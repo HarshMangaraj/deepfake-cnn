@@ -4,7 +4,7 @@ from PIL import Image
 from torchvision import transforms
 
 # open image
-image = Image.open("data/real/blackman.jpg")
+image = Image.open("data/real/1.jpg")
 
 # resize + convert to tensor
 transform = transforms.Compose([

@@ -10,6 +10,9 @@ import torch.nn as nn
 # pyrefly: ignore [missing-import]
 from torchvision import transforms
 
+# pyrefly: ignore [missing-import]
+from torch.utils.data import random_split
+
 # ----------------
 # image transform
 # ----------------
@@ -29,7 +32,7 @@ labels = []
 
 # real = 0
 for image_path in real_folder.glob("*"):
-    image = Image.open(image_path)
+    image = Image.open(image_path).convert("RGB")
 
     tensor = transform(image)
 
@@ -50,6 +53,24 @@ for image_path in fake_folder.glob("*"):
 images = torch.stack(images)
 
 labels = torch.tensor(labels)
+
+dataset = list(
+    zip(images, labels)
+)
+
+train_size = int(
+    0.8 * len(dataset)
+)
+
+val_size = len(dataset) - train_size
+
+train_data, val_data = random_split(
+    dataset,
+    [train_size, val_size]
+)
+
+print("Train:", len(train_data))
+print("Validation:", len(val_data))
 
 # ----------------
 # model
@@ -88,31 +109,48 @@ optimizer = torch.optim.Adam(
 # ----------------
 for epoch in range(10):
 
-    # model prediction
     output = model(images)
 
-    # calculate loss
     loss = loss_function(
         output,
         labels
     )
 
-    # clear old gradients
     optimizer.zero_grad()
 
-    # learn from mistakes
     loss.backward()
 
-    # update model
     optimizer.step()
 
-    print(
-        "Epoch:",
-        epoch + 1,
-        "Loss:",
-        loss.item()
+    predictions = torch.argmax(
+        output,
+        dim=1
     )
 
+    correct = (
+        predictions == labels
+    ).sum().item()
+
+    accuracy = correct / len(labels)
+
+    print("Epoch:", epoch + 1)
+
+    print("Loss:", loss.item())
+
+    print(
+        "Accuracy:",
+        f"{accuracy:.2%}"
+    )
+
+    print(
+        "Predictions:",
+        predictions
+    )
+
+    print(
+        "Labels:",
+        labels
+    )
 # Save model
 torch.save(
     model.state_dict(),
