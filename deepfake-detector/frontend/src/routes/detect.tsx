@@ -41,7 +41,7 @@ function DetectPage() {
     try {
       setLoading(true);
       setError(null);
-      const res = await fetch("http://localhost:8000/predict", {
+      const res = await fetch("https://deepfake-cnn.onrender.com/predict", {
         method: "POST",
         body: formData,
       });
