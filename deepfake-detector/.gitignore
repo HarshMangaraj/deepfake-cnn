@@ -34,6 +34,8 @@ dist-ssr
 .output
 .vinxi
 .tanstack/**
+.vercel/
+.vercel-old/
 .nitro
 *.local
 
