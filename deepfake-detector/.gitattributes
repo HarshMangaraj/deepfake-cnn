@@ -1,0 +1,7 @@
+# Auto-detect text files and perform LF normalization
+* text=auto
+
+# Keep bun.lock with LF endings to prevent Git CRLF conversion warnings
+bun.lock text eol=lf
+package-lock.json text eol=lf
+yarn.lock text eol=lf
