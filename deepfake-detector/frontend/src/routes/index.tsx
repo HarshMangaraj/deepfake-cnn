@@ -27,7 +27,7 @@ function Index() {
       <section className="relative h-screen flex flex-col justify-end px-6 pb-24 overflow-hidden bg-black">
         <div className="absolute inset-0 z-0">
           <video 
-            src="../../public/10140734-uhd_4096_2160_25fps.mp4"
+            src="/10140734-uhd_4096_2160_25fps.mp4"
             className="w-full h-full object-cover opacity-30" 
             autoPlay
             loop
@@ -97,7 +97,7 @@ function Index() {
           {/* Left: Image */}
           <div className="relative h-[50vh] md:h-auto overflow-hidden">
             <img
-              src="../../public/image2.png"
+              src="/image2.png"
               alt="AI neural network visualization representing deep learning detection"
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -126,7 +126,7 @@ function Index() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 md:gap-24 items-center">
           <div className="md:col-span-5 overflow-hidden h-[600px] md:h-[800px] relative border border-neutral-800">
             <video  
-              src="../../public/video2.mp4"
+              src="/video2.mp4"
               className="w-full h-full object-cover"
               autoPlay
               loop
@@ -163,7 +163,7 @@ function Index() {
           className="absolute inset-0 -top-48 -bottom-48 z-0 opacity-30"
         >
           <video
-            src="../../public/video3.mp4"
+            src="/video3.mp4"
             className="w-full h-full object-cover"
             autoPlay
             loop
@@ -236,7 +236,7 @@ function Index() {
         <div className="grid grid-cols-3 h-[40vh] md:h-[60vh]">
           {[
             { src: "https://images.unsplash.com/photo-1542080681-b52d382432af?auto=format&fit=crop&q=80&w=800", alt: "Real human portrait - authentic" },
-            { src: "../../public/image3.png", alt: "AI-generated face - deepfake example" },
+            { src: "/image3.png", alt: "AI-generated face - deepfake example" },
             { src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=800", alt: "Comparative analysis of real vs fake" },
           ].map((img, i) => (
             <div key={i} className="overflow-hidden relative group">
@@ -255,7 +255,7 @@ function Index() {
       <section className="relative py-48 px-6 flex flex-col items-center justify-center text-center overflow-hidden bg-black">
         <div className="absolute inset-0 z-0 opacity-20">
           <video
-            src="../../public/video4.mp4"
+            src="/video4.mp4"
             className="w-full h-full object-cover"
             autoPlay
             loop

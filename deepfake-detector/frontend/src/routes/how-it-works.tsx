@@ -80,7 +80,7 @@ function HowItWorks() {
       {/* Deep ocean background */}
       <div className="fixed inset-0 z-0">
         <img 
-          src="../../public/image5.png"
+          src="/image5.png"
           alt="Deep ocean background"
           className="w-full h-full object-cover"
         />

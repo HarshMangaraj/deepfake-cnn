@@ -61,7 +61,7 @@ function DetectPage() {
       {/* Deep ocean background image */}
       <div className="fixed inset-0 z-0">
         <img 
-          src="../../public/image4.png"
+          src="/image4.png"
           alt="Deep ocean background"
           className="w-full h-full object-cover"
         />

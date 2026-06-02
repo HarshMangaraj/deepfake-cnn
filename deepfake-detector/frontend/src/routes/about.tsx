@@ -22,7 +22,7 @@ function About() {
       {/* Background video for translucency effect */}
       <div className="fixed inset-0 z-0 opacity-30">
         <video 
-          src="../../public/10140734-uhd_4096_2160_25fps.mp4"
+          src="/10140734-uhd_4096_2160_25fps.mp4"
           className="w-full h-full object-cover" 
           autoPlay
           loop
