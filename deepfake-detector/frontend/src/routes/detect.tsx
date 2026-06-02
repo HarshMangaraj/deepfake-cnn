@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
-import { UploadCloud, Image as ImageIcon, Loader2, RotateCcw, ShieldCheck, AlertTriangle, ScanLine } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/detect")({
   head: () => ({
     meta: [
-      { title: "Detect — Deepfake Detector" },
-      { name: "description", content: "Upload an image to analyze whether it's authentic or a deepfake." },
+      { title: "Analysis — Deepfake Detector" },
+      { name: "description", content: "Upload media for analysis." },
     ],
   }),
   component: DetectPage,
@@ -50,135 +50,158 @@ function DetectPage() {
       setResult(data);
     } catch (err) {
       console.error(err);
-      setError("Prediction failed. Make sure the API is running at 127.0.0.1:8000.");
+      setError("Analysis failed. Ensure endpoint is active.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="mx-auto max-w-2xl px-6 py-16 md:py-24">
-      <div className="text-center mb-10">
-        <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground">
-          Analyze an image
-        </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Drop or select a JPG / PNG. Nothing is stored.
-        </p>
-      </div>
-
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.add("border-primary", "bg-primary/5");
-        }}
-        onDragLeave={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.remove("border-primary", "bg-primary/5");
-        }}
-        onDrop={(e) => {
-          e.preventDefault();
-          e.currentTarget.classList.remove("border-primary", "bg-primary/5");
-          const f = e.dataTransfer.files?.[0];
-          if (f) onSelect(f);
-        }}
-        onClick={() => inputRef.current?.click()}
-        className="group border-2 border-dashed border-border rounded-xl p-12 text-center cursor-pointer hover:border-primary/50 hover:bg-card/50 transition-all duration-200 bg-card/20 backdrop-blur-sm"
-      >
-        <input
-          ref={inputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Deep ocean background image */}
+      <div className="fixed inset-0 z-0">
+        <img 
+          src="../../public/image4.png"
+          alt="Deep ocean background"
+          className="w-full h-full object-cover"
         />
-        {preview ? (
-          <div className="relative">
-            <img src={preview} alt="Selected" className="mx-auto max-h-72 rounded-lg object-contain shadow-lg" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center text-white text-sm font-medium">
-              Click to replace
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center text-muted-foreground">
-            <div className="p-4 bg-secondary rounded-full mb-4 group-hover:scale-110 transition-transform">
-              <UploadCloud className="w-8 h-8 text-primary" />
-            </div>
-            <p className="text-base font-medium text-foreground">Click or drag an image here</p>
-            <p className="text-xs mt-2 opacity-70">PNG, JPG up to ~10MB</p>
-          </div>
-        )}
-        {file && !preview && (
-          <p className="mt-4 text-xs text-muted-foreground truncate flex items-center justify-center gap-2">
-            <ImageIcon className="w-3 h-3" /> {file.name}
-          </p>
-        )}
+        {/* Dark overlay for better text contrast */}
+        <div className="absolute inset-0 bg-black/60" />
+        {/* Subtle blue gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/30 via-transparent to-blue-950/40" />
       </div>
 
-      <div className="mt-8 flex justify-center gap-4">
-        <button
-          onClick={handleUpload}
-          disabled={!file || loading}
-          className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground shadow-md hover:bg-primary/90 hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0 disabled:cursor-not-allowed transition-all"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Analyzing…
-            </>
-          ) : (
-            <>
-              <ScanLine className="w-4 h-4" />
-              Analyze Image
-            </>
-          )}
-        </button>
-        {file && (
-          <button
-            onClick={() => onSelect(null)}
-            className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background px-6 py-3 text-sm font-medium text-foreground hover:bg-secondary transition-colors"
-          >
-            <RotateCcw className="w-4 h-4" />
-            Reset
-          </button>
-        )}
-      </div>
+      {/* Content */}
+      <div className="relative z-10 min-h-[80vh] flex flex-col px-6 py-32 md:py-48 max-w-7xl mx-auto w-full font-serif">
+        
+        <div className="mb-24 flex items-end justify-between border-b border-white/10 pb-8">
+          <h1 className="text-5xl md:text-8xl font-light tracking-tight capitalize leading-none text-white">
+            Intelligence
+          </h1>
+          <span className="text-xs uppercase tracking-[0.3em] font-sans font-bold text-neutral-300 hidden md:block">
+            [ Drop media to begin ]
+          </span>
+        </div>
 
-      {error && (
-        <p className="mt-6 text-center text-sm text-destructive">{error}</p>
-      )}
-
-      {result && (
-        <div className="mt-12 border border-border/50 rounded-xl p-8 bg-card/30 backdrop-blur-sm shadow-sm text-center relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/20 via-primary to-primary/20 opacity-50" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16 flex-1">
           
-          <p className="text-xs uppercase tracking-[0.25em] text-muted-foreground font-medium mb-4">Verdict</p>
-          
-          <div className="flex items-center justify-center gap-3 mb-6">
-            {result.result === "REAL" ? (
-              <ShieldCheck className="w-8 h-8 text-green-500" />
-            ) : (
-              <AlertTriangle className="w-8 h-8 text-destructive" />
-            )}
-            <p className={`text-4xl font-extrabold tracking-tight ${result.result === "REAL" ? "text-green-500" : "text-destructive"}`}>
-              {result.result}
-            </p>
-          </div>
-
-          <div className="max-w-md mx-auto">
-            <div className="flex justify-between text-sm font-medium text-foreground mb-2">
-              <span>Confidence Score</span>
-              <span>{result.confidence}%</span>
-            </div>
-            <div className="h-2 w-full bg-secondary rounded-full overflow-hidden shadow-inner">
-              <div
-                className={`h-full transition-all duration-1000 ease-out ${result.result === "REAL" ? "bg-green-500" : "bg-destructive"}`}
-                style={{ width: `${result.confidence}%` }}
+          {/* Left Column: Upload */}
+          <div className="flex flex-col h-full">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.add("border-white/40", "bg-white/10");
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("border-white/40", "bg-white/10");
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.currentTarget.classList.remove("border-white/40", "bg-white/10");
+                const f = e.dataTransfer.files?.[0];
+                if (f) onSelect(f);
+              }}
+              onClick={() => inputRef.current?.click()}
+              className="flex-1 min-h-[400px] border border-white/20 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center p-6 hover:bg-black/60 hover:border-white/30 transition-all duration-500 cursor-pointer relative group rounded-lg"
+            >
+              <input
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => onSelect(e.target.files?.[0] ?? null)}
               />
+              {preview ? (
+                <img src={preview} alt="Selected" className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:opacity-40 transition-opacity rounded-lg" />
+              ) : null}
+              
+              <div className="z-10 text-center font-sans">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-bold mb-4 block text-neutral-300 group-hover:text-white transition-colors">[ Select ]</span>
+                <p className="text-3xl font-serif font-light tracking-tight capitalize text-white">Drop Artifact</p>
+                <p className="text-xs text-neutral-400 mt-4">or click to browse</p>
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-between items-center border-b border-white/10 pb-4 font-sans">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-300 truncate max-w-[200px]">
+                {file ? file.name : "No file"}
+              </span>
+              <div className="flex gap-6">
+                <button
+                  onClick={() => onSelect(null)}
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:text-neutral-300 transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={handleUpload}
+                  disabled={!file || loading}
+                  className="text-[10px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-30 hover:text-neutral-300 transition-colors"
+                >
+                  {loading ? "Analyzing..." : "Verify"}
+                </button>
+              </div>
+            </div>
+            {error && <p className="mt-4 text-xs font-sans uppercase tracking-[0.2em] text-red-400">{error}</p>}
+          </div>
+
+          {/* Right Column: Result */}
+          <div className="flex flex-col h-full">
+            <div className="border-l border-white/10 pl-0 md:pl-16 pt-12 md:pt-0 h-full">
+              <span className="text-[10px] font-sans font-bold uppercase tracking-[0.3em] text-neutral-300 mb-12 block">
+                [ Verdict ]
+              </span>
+              
+              <AnimatePresence mode="wait">
+                {result ? (
+                  <motion.div
+                    key="result"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 1, ease: [0.76, 0, 0.24, 1] }}
+                    className="flex flex-col flex-1"
+                  >
+                    <div className="flex-1 flex items-center min-h-[300px]">
+                      <h2 className={`text-6xl lg:text-7xl font-serif font-light tracking-tight capitalize leading-tight ${result.result === "REAL" ? "text-white" : "text-red-400"}`}>
+                        {result.result === "REAL" ? "Authentic." : "Synthetic."}
+                      </h2>
+                    </div>
+                    
+                    <div className="mt-12 font-sans">
+                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-[0.3em] mb-4 text-neutral-300">
+                        <span>Confidence</span>
+                        <span>{result.confidence}%</span>
+                      </div>
+                      <div className="h-px w-full bg-white/20 relative overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${result.confidence}%` }}
+                          transition={{ duration: 1.5, delay: 0.5, ease: [0.76, 0, 0.24, 1] }}
+                          className={`absolute top-0 left-0 h-full ${result.result === "REAL" ? "bg-white" : "bg-red-400"}`}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="empty"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex-1 flex items-center justify-center min-h-[400px]"
+                  >
+                    <span className="text-[10px] font-sans font-bold uppercase tracking-[0.3em] text-neutral-500">
+                      Awaiting media
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
-      )}
-    </section>
+      </div>
+    </div>
   );
 }
