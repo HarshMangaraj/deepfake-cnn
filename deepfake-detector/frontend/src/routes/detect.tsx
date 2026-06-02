@@ -14,11 +14,15 @@ export const Route = createFileRoute("/detect")({
 
 type Result = { result: string; confidence: number };
 
+const BACKEND_URL = "https://deepfake-cnn.onrender.com";
+const TIMEOUT_MS = 90_000; // 90s — allows Render cold start (can take 30-60s)
+
 function DetectPage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState("Analyzing...");
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -36,23 +40,51 @@ function DetectPage() {
 
   const handleUpload = async () => {
     if (!file) return;
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    // After 5s with no response, assume Render is cold-starting
+    const wakeUpTimerId = setTimeout(() => {
+      setLoadingMsg("Waking up backend… (first request may take ~30s)");
+    }, 5000);
+
     const formData = new FormData();
     formData.append("file", file);
+
     try {
       setLoading(true);
+      setLoadingMsg("Analyzing...");
       setError(null);
-      const res = await fetch("https://deepfake-cnn.onrender.com/predict", {
+
+      const res = await fetch(`${BACKEND_URL}/predict`, {
         method: "POST",
         body: formData,
+        signal: controller.signal,
       });
-      if (!res.ok) throw new Error("Request failed");
+
+      clearTimeout(timeoutId);
+      clearTimeout(wakeUpTimerId);
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(`Server error ${res.status}${text ? `: ${text}` : ""}`);
+      }
+
       const data = (await res.json()) as Result;
       setResult(data);
-    } catch (err) {
+    } catch (err: unknown) {
+      clearTimeout(timeoutId);
+      clearTimeout(wakeUpTimerId);
       console.error(err);
-      setError("Analysis failed. Ensure endpoint is active.");
+      if (err instanceof Error && err.name === "AbortError") {
+        setError("Request timed out. The backend may be sleeping — try again in 30s.");
+      } else {
+        setError("Analysis failed. Check that the backend is deployed and running.");
+      }
     } finally {
       setLoading(false);
+      setLoadingMsg("Analyzing...");
     }
   };
 
@@ -139,7 +171,7 @@ function DetectPage() {
                   disabled={!file || loading}
                   className="text-[10px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-30 hover:text-neutral-300 transition-colors"
                 >
-                  {loading ? "Analyzing..." : "Verify"}
+                  {loading ? loadingMsg : "Verify"}
                 </button>
               </div>
             </div>
